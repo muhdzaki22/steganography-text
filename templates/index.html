@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Steganography</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .container { width: 100%; max-width: 600px; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); background-color:#12080863; }
+        h1 { font-size: 24px; text-align: center; color: #333; }
+        label { font-weight: bold; margin-top: 10px; display: block; }
+        textarea, input[type="text"], button { width: 96%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #4CAF50; color: black; font-weight: bold; cursor: pointer;  width: -webkit-fill-available;}
+        button:hover { background-color: #45a049; }
+        .output { margin-top: 15px; background-color: #e6e6e6; padding: 10px; border-radius: 4px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Text Steganography</h1>
+        <label for="publicText">Public Text</label>
+        <textarea id="publicText" rows="3" placeholder="Enter the public (visible) text"></textarea>
+
+        <label for="privateText">Secret Text (to hide)</label>
+        <input type="text" id="privateText" placeholder="Enter the secret text to hide">
+
+        <button onclick="encodeMessage()">Encode Message</button>
+        <div class="output" id="encodedOutput"></div>
+
+        <label for="stegoText">Encoded Text (for decoding)</label>
+        <textarea id="stegoText" rows="3" placeholder="Enter text with hidden message to decode"></textarea>
+
+        <button onclick="decodeMessage()">Decode Message</button>
+        <div class="output" id="decodedOutput"></div>
+    </div>
+
+    <script>
+        function encodeMessage() {
+            const publicText = document.getElementById('publicText').value;
+            const privateText = document.getElementById('privateText').value;
+
+            fetch('/encode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ public_text: publicText, private_text: privateText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('encodedOutput').innerText = "Encoded Text:\n" + data.stego_text;
+            });
+        }
+
+        function decodeMessage() {
+            const stegoText = document.getElementById('stegoText').value;
+
+            fetch('/decode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ stego_text: stegoText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('decodedOutput').innerText = "Decoded Message:\n" + data.decoded_message;
+            });
+        }
+    </script>
+</body>
+</html>
